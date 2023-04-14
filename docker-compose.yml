@@ -1,0 +1,33 @@
+services:
+  run_daq:
+    build: 
+      context: ./Ubuntu20.04
+      args:
+        SSH_MASTER_USER: ${SSH_MASTER_USER}
+        SSH_MASTER_PASS: ${SSH_MASTER_PASS}
+    container_name: main_container
+    devices:
+      - /dev/usbmon0:/dev/usbmon0
+      - /dev/dri:/dev/dri
+    volumes:
+      - /home/lab/daq/MightyPixdaq_slow_recever/:/daq
+      - ./scripts:/scripts
+      - /tmp/.X11-unix:/tmp/.X11-unix # X-server forwarding
+      - ~/.Xauthority:/root/.Xauthority
+    hostname: server
+    ports:
+      - 24:24/tcp
+      - 4660:4660/udp
+      - 2222:22
+    environment:
+      - DISPLAY=${DISPLAY}
+      - TOKEN=lhcb-lab1-uni-bonn-de/unix:11  MIT-MAGIC-COOKIE-1  f51b944aa35efdc34b48834c586d1667
+    # network_mode: host
+    # command:  python3 /scripts/example_script.py
+    networks:
+      - eudaq_network
+
+networks:
+  eudaq_network:
+    name: EUDAQNetwork
+    driver: bridge
